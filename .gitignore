@@ -1,0 +1,17 @@
+# Python / uv
+.venv/
+__pycache__/
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Secrets (WSDOT key later). Never commit these
+.env
+
+# Data is rebuilt by the pipeline, so it isn't source code
+data/
+
+docs/phases/*
+
+.claude/

@@ -1,0 +1,15 @@
+resorts:
+  - id: crystal              # short stable key, used in folder names and URLs
+    name: Crystal Mountain
+    state: WA
+    pass: ikon               # lets you ask "which Ikon resorts have snow?"
+    timezone: America/Los_Angeles   # for converting UTC to local time when serving
+    points:                  # spots we fetch weather for
+      - name: base
+        latitude: 46.9355
+        longitude: -121.4745
+        elevation_m: 1341    # ~4,400 ft
+      - name: summit
+        latitude: 46.9282
+        longitude: -121.5045
+        elevation_m: 2094    # ~6,870 ft

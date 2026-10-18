@@ -1,0 +1,19 @@
+[project]
+name = "skiiprep-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1.5.6",
+    "fastapi>=0.143.3",
+    "skiiprep-common",
+    "uvicorn>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+skiiprep-common = { workspace = true }
