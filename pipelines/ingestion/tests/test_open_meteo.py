@@ -52,12 +52,14 @@ def ok_client(seen: list[httpx.Request] | None = None) -> httpx.Client:
 
 
 def bronze_files(root: Path) -> list[Path]:
+    """All bronze files under `root`, sorted so comparisons don't depend on order."""
     return sorted(root.rglob("*.json"))
 
 
 # --- build_params -----------------------------------------------------------
 
 def test_build_params_takes_location_from_its_own_point():
+    """Each point sends its own lat/lon/elevation; mixing them gives wrong temperatures (SD1)."""
     base, summit = build_params(BASE), build_params(SUMMIT)
 
     assert (base["latitude"], base["longitude"], base["elevation"]) == (46.9355, -121.4745, 1341)
@@ -65,6 +67,7 @@ def test_build_params_takes_location_from_its_own_point():
 
 
 def test_build_params_fixed_values():
+    """UTC, 7 days and exactly the 12 hourly variables, whatever the point."""
     params = build_params(BASE)
 
     assert params["timezone"] == "UTC"
@@ -77,12 +80,14 @@ def test_build_params_fixed_values():
 # --- bronze_path ------------------------------------------------------------
 
 def test_bronze_path_layout(tmp_path):
+    """Hive-style folders and a colon-free UTC file name, as in system design §4."""
     path = bronze_path("crystal", "summit", FETCHED_AT, root=tmp_path)
 
     assert path == tmp_path / "open_meteo/resort_id=crystal/point=summit/2026-10-20T005105Z.json"
 
 
 def test_bronze_path_converts_aware_times_to_utc(tmp_path):
+    """A non-UTC time is converted, so the `Z` in the name is always true."""
     pacific = timezone(timedelta(hours=-7))
     local = datetime(2026, 10, 19, 17, 51, 5, tzinfo=pacific)  # same instant as FETCHED_AT
 
@@ -90,12 +95,14 @@ def test_bronze_path_converts_aware_times_to_utc(tmp_path):
 
 
 def test_bronze_path_rejects_naive_datetime(tmp_path):
+    """A naive time has no timezone, so we can't know it's UTC: refuse it."""
     with pytest.raises(ValueError):
         bronze_path("crystal", "base", datetime(2026, 10, 20, 0, 51, 5), root=tmp_path)
 
 
 @pytest.mark.parametrize("resort_id, point_name", [("", "base"), ("crystal", "")])
 def test_bronze_path_rejects_empty_names(tmp_path, resort_id, point_name):
+    """An empty id or point name would produce a broken folder like `resort_id=`."""
     with pytest.raises(ValueError):
         bronze_path(resort_id, point_name, FETCHED_AT, root=tmp_path)
 
@@ -103,6 +110,7 @@ def test_bronze_path_rejects_empty_names(tmp_path, resort_id, point_name):
 # --- fetch_point ------------------------------------------------------------
 
 def test_fetch_point_writes_envelope(tmp_path):
+    """The file holds the lineage envelope and the response exactly as received."""
     seen: list[httpx.Request] = []
 
     path = fetch_point(ok_client(seen), CRYSTAL, SUMMIT, root=tmp_path, fetched_at=FETCHED_AT)
@@ -124,6 +132,7 @@ def test_fetch_point_writes_envelope(tmp_path):
 
 
 def test_fetch_point_http_error_raises_and_writes_nothing(tmp_path):
+    """An error body must never land in bronze, where phase 2 would parse it as a forecast."""
     error = {"error": True, "reason": "Invalid value: ... snow_depths"}
     client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(400, json=error)))
 
@@ -134,6 +143,7 @@ def test_fetch_point_http_error_raises_and_writes_nothing(tmp_path):
 
 
 def test_fetch_point_never_overwrites(tmp_path):
+    """Bronze is immutable: the same file name twice fails and the first file is untouched."""
     path = fetch_point(ok_client(), CRYSTAL, BASE, root=tmp_path, fetched_at=FETCHED_AT)
     original = path.read_bytes()
 
@@ -144,6 +154,7 @@ def test_fetch_point_never_overwrites(tmp_path):
 
 
 def test_fetch_point_twice_adds_a_new_file_and_keeps_the_first(tmp_path):
+    """Re-running ingest adds new evidence; it never replaces old evidence."""
     first = fetch_point(ok_client(), CRYSTAL, BASE, root=tmp_path, fetched_at=FETCHED_AT)
     original = first.read_bytes()
 
@@ -158,6 +169,7 @@ def test_fetch_point_twice_adds_a_new_file_and_keeps_the_first(tmp_path):
 # --- ingest -----------------------------------------------------------------
 
 def test_ingest_writes_one_file_per_point(tmp_path):
+    """One request and one file per point, base before summit."""
     seen: list[httpx.Request] = []
 
     paths = ingest([CRYSTAL], client=ok_client(seen), root=tmp_path)
@@ -168,6 +180,7 @@ def test_ingest_writes_one_file_per_point(tmp_path):
 
 
 def test_ingest_leaves_a_passed_in_client_open(tmp_path):
+    """Whoever creates a client closes it; ingest only closes clients it made itself."""
     client = ok_client()
 
     ingest([CRYSTAL], client=client, root=tmp_path)
