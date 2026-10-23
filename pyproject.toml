@@ -11,3 +11,8 @@ members = ["libs/*", "pipelines/*", "services/*", "agents/*"]
 dev = [
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "spark: starts a Spark session (slow); skip with -m 'not spark'",
+]
