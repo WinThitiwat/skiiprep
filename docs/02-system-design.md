@@ -103,6 +103,7 @@ data/bronze/open_meteo/resort_id=crystal/point=summit/2026-10-15T224000Z.json
 | SD10 | **Scheduling by hand** until data flows end to end | cron/launchd or Airflow now | Get correctness first, then automate |
 | SD11 | **One folder per component, each its own uv package** in one repo (a uv *workspace*) | One package with sub-modules (`src/<folders>`) | Each component has only the dependencies it needs (the API doesn't install PySpark) and could be deployed on its own later |
 | SD12 | **Components grouped by role**: `pipelines/`, `services/`, `libs/`, `agents/` | All components flat at the root, or one `packages/` folder | Scales to many components; the folder states the rules (services never write); maps to deployment (jobs vs containers); glob members mean new components need no root config change |
+| SD13 | **Table definitions (`tables/`) separate from job logic (`jobs/`)** in `pipelines/transformation/` | DDL and transform logic in one file per job | The schema is reviewed on its own and read by people and the LLM; jobs change often. Easy to navigate as the number of tables and jobs grows |
 | SD7 | **RAG only for text** (forecast discussions, avalanche forecasts, guides), see §8 | Embed everything | Numbers belong in SQL; vector search is fuzzy by design |
 
 ## 6. Folder layout
@@ -134,7 +135,10 @@ skiiprep/
 │   ├── transformation/             ← package: skiiprep_transformation (writes Iceberg)
 │   │   ├── src/skiiprep_transformation/
 │   │   │   ├── spark.py            ← Spark session + Iceberg catalog config
-│   │   │   ├── jobs/weather_hourly.py  (later: gold jobs, docs_chunks.py)
+│   │   │   ├── tables/             ← table definitions (DDL) only, one file per table
+│   │   │   │   └── weather_hourly.py   ← silver table `lake.weather.silver_weather_hourly`
+│   │   │   ├── jobs/               ← logic: read, flatten, MERGE. Imports from tables/
+│   │   │   │   └── weather_hourly.py   (later: gold jobs, docs_chunks.py)
 │   │   │   └── cli.py              ← `uv run transform weather`
 │   │   └── tests/
 │   └── rag/                        ← later (phase 7): package skiiprep_rag (writes Chroma)
