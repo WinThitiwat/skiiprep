@@ -1,7 +1,28 @@
-# SkiiPrep build guide
+## Project overview
 
-You write the code; these docs explain **what** to build, **why** it's shaped that way, and **how to check** you got it right.
+SkiiPrep is a personal ski and snowboard trip assistant. Before a ski day, you usually check the weather forecast, the resort's snow report, and WSDOT for the pass. SkiiPrep brings these together in one assistant you can ask in plain English. Its answers come from fresh data, not from an LLM's memory.
 
+**Scope**
+- Single user, running locally on a Mac.
+- Starts with Crystal Mountain, WA. Other Ikon and Epic resorts are added as config, not code.
+
+**Questions it should answer**
+- **Weather:** how much snow is coming, rain vs. snow at base and summit, wind on the upper lifts, what to wear, and which day looks best.
+- **Forecast history:** whether a forecast for a given day has improved or worsened.
+- **Snow report and roads:** which lifts are open, whether SR-410 needs chains, and whether Chinook Pass is open.
+- **Text (RAG):** what forecasters say about a storm, the avalanche danger, and where to park.
+
+**How it works:** collect → clean → serve → chat
+1. **Ingest:** pull from Open-Meteo and keep each raw response unchanged (bronze).
+2. **Transform:** PySpark cleans the data into Iceberg tables (silver). MERGE keeps re-runs from duplicating rows.
+3. **Serve:** DuckDB answers SQL over those tables, exposed through FastAPI and MCP tools.
+4. **Chat:** Claude Desktop calls the MCP tools, so the numbers come from tool results.
+
+**Roadmap**
+- Done: weather ingest, Iceberg, and DuckDB outlook.
+- Next: FastAPI and MCP server, then snow report, roads (WSDOT), and RAG over text sources (Chroma).
+- Later: scheduling, more resorts, and cloud.
+----
 ## How to use it
 1. Read [01-requirements.md](01-requirements.md) and [02-system-design.md](02-system-design.md). Edit them until they say what you want. They are yours.
 2. Work through the phases in order. Each phase guide has:
