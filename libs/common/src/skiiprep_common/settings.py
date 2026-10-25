@@ -34,6 +34,7 @@ PROJECT_ROOT = _find_project_root()
 DATA_DIR = PROJECT_ROOT / "data"  # git-ignored; rebuilt by the pipelines
 DATA_BRONZE_DIR = DATA_DIR / "bronze"
 DATA_WAREHOUSE_DIR = DATA_DIR / "warehouse"
+SILVER_WEATHER_TABLE_DIR = DATA_WAREHOUSE_DIR / "weather/silver_weather_hourly"
 
 CONFIG_DIR = PROJECT_ROOT / "config"
 RESORTS_FILE = CONFIG_DIR / "resorts.yaml"
