@@ -42,11 +42,13 @@ SkiiPrep is a personal ski and snowboard trip assistant. Before a ski day, you u
 | 2 | [Bronze → silver Iceberg table with PySpark](phases/phase-02-silver-iceberg.md) | `pipelines/transformation/` | ready |
 | 3 | [API service: FastAPI + DuckDB](phases/phase-03-api.md) | `services/api/` | outline |
 | 4 | [MCP server + Claude Desktop](phases/phase-04-mcp-server.md) | `services/mcp_server/` | outline |
-| 5 | Snow report source | `pipelines/` | to plan together |
-| 6 | Road conditions (WSDOT) | `pipelines/` | to plan together |
-| 7 | RAG pipeline: chunking, embeddings, Chroma ([design §8](02-system-design.md#8-rag-pipeline-phase-7)) | `pipelines/`, `services/api/` | designed, to detail together |
-| 8 | Your own agent (MCP client) combining SQL tools + RAG | `agents/` | to plan together |
-| 9 | Scheduling | `orchestration/` | after data flows end to end |
-| 10 | More resorts, cloud | | to plan together |
+| 5 | [Modernize the design: measure, then optimize](phases/phase-05-modernize-design.md) | `pipelines/transformation/`, `services/api/` | outline |
+| 6 | Snow report source | `pipelines/` | to plan together |
+| 7 | Road conditions (WSDOT) | `pipelines/` | to plan together |
+| 8 | RAG pipeline: chunking, embeddings, Chroma ([design §8](02-system-design.md#8-rag-pipeline-phase-8)) | `pipelines/`, `services/api/` | designed, to detail together |
+| 9 | Your own agent (MCP client) combining SQL tools + RAG | `agents/` | to plan together |
+| 10 | Scheduling | `orchestration/` | after data flows end to end |
+| 11 | [Productionize: Docker and AWS](phases/phase-11-productionize.md) | every component, plus infrastructure | outline |
+| 12 | More resorts | `config/resorts.yaml` | to plan together |
 
 Later phases are written once we've discussed them, so they reflect what you learned in the earlier ones.

@@ -142,7 +142,7 @@ skiiprep/
 │   │   │   │   └── weather_hourly.py   (later: gold jobs, docs_chunks.py)
 │   │   │   └── cli.py              ← `uv run transform weather`
 │   │   └── tests/
-│   └── rag/                        ← later (phase 7): package skiiprep_rag (writes Chroma)
+│   └── rag/                        ← later (phase 8): package skiiprep_rag (writes Chroma)
 │
 ├── services/                       ← long-running, READ only
 │   ├── api/                        ← package: skiiprep_api
@@ -179,7 +179,7 @@ Why `mcp_server/` and not `mcp/`? The official MCP SDK's package is called `mcp`
 | Scheduling | By hand until end to end works (SD10) |
 | Code layout | One package per component, uv workspace (SD11), grouped by role (SD12) |
 
-## 8. RAG pipeline (phase 7)
+## 8. RAG pipeline (phase 8)
 
 ### Why RAG here, and only here
 Numbers (snowfall, wind, temperature) are answered with SQL, because "exact and fresh" is what matters. Some questions are about **prose** that no table captures: *"Why is the forecast so uncertain this weekend?"*, *"What's the avalanche problem today?"*, *"Where do I park at Crystal on a busy Saturday?"* That text is what RAG is for: find the few relevant passages and let the LLM answer from them, with citations.
@@ -214,7 +214,7 @@ flowchart LR
 - **Evaluation.** A small "golden" list of questions with the passages that should come back, so a chunking change is measured rather than guessed.
 - **Hybrid answers.** "Is Saturday worth it?" uses the SQL tools for numbers plus RAG for the forecaster's confidence and the avalanche danger. The agent decides which tools to call.
 
-### Decisions (to confirm when we reach phase 7)
+### Decisions (to confirm when we reach phase 8)
 | # | Decision | Recommendation | Why |
 |---|----------|---------------|-----|
 | R1 | Vector DB | **Chroma** (your pick) | Simple, local, Python-first |
